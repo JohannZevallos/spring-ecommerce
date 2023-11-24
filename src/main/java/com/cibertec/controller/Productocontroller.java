@@ -2,6 +2,7 @@ package com.cibertec.controller;
 
 import java.util.Optional;
 
+
 import org.slf4j.*;
 
 import org.slf4j.LoggerFactory;
@@ -65,5 +66,11 @@ public class Productocontroller {
 		return "redirect:/productos";
 	}
 	
+	@GetMapping("/delete/{id}")
+	public String delete(@PathVariable Integer id) {		
+
+		productoService.delete(id);
+		return "redirect:/productos";
+	}
 	
 }
