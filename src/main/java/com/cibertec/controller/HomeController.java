@@ -1,9 +1,11 @@
 package com.cibertec.controller;
 
 import java.util.ArrayList;
+
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -152,28 +154,36 @@ public class HomeController {
 	}
 	
 	// guardar la orden
-		@GetMapping("/saveOrder")
-		public String saveOrder() {
-			Date fechaCreacion = new Date();
-			orden.setFechaCreacion(fechaCreacion);
-			orden.setNumero(ordenService.generarNumeroOrden());
+	@GetMapping("/saveOrder")
+	public String saveOrder() {
+		Date fechaCreacion = new Date();
+		orden.setFechaCreacion(fechaCreacion);
+		orden.setNumero(ordenService.generarNumeroOrden());
 			
-			//usuario
-			Usuario usuario =usuarioService.findById(1).get();
+		//usuario
+		Usuario usuario =usuarioService.findById(1).get();
 			
-			orden.setUsuario(usuario);
-			ordenService.save(orden);
+		orden.setUsuario(usuario);
+		ordenService.save(orden);
 			
-			//guardar detalles
-			for (DetalleOrden dt:detalles) {
-				dt.setOrden(orden);
-				detalleOrdenService.save(dt);
-			}
-			
-			///limpiar lista y orden
-			orden = new Orden();
-			detalles.clear();
-			
-			return "redirect:/";
+		//guardar detalles
+		for (DetalleOrden dt:detalles) {
+			dt.setOrden(orden);
+			detalleOrdenService.save(dt);
 		}
+			
+		///limpiar lista y orden
+		orden = new Orden();
+		detalles.clear();
+			
+		return "redirect:/";
+	}
+	
+	@PostMapping("/search")
+	public String searchProduct(@RequestParam String nombre, Model model) {
+		log.info("Nombre del producto: {}", nombre);
+		List<Producto> productos= productoService.findAll().stream().filter( p -> p.getNombre().contains(nombre)).collect(Collectors.toList());
+		model.addAttribute("productos", productos);		
+		return "usuario/home";
+	}	
 }
