@@ -1,9 +1,8 @@
 package com.cibertec.controller;
 
 import java.io.IOException;
+
 import java.util.Optional;
-
-
 
 import org.slf4j.*;
 
@@ -20,8 +19,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.cibertec.model.Producto;
 import com.cibertec.model.Usuario;
+import com.cibertec.service.IUsuarioService;
 import com.cibertec.service.ProductoService;
 import com.cibertec.service.UploadFileService;
+
+import jakarta.servlet.http.HttpSession;
 
 
 @Controller
@@ -32,6 +34,9 @@ public class Productocontroller {
 	
 	@Autowired
 	private ProductoService productoService;
+	
+	@Autowired
+	private IUsuarioService usuarioService;
 	
 	
 	@Autowired
@@ -48,11 +53,12 @@ public class Productocontroller {
 		return "productos/create";
 	}
 	@PostMapping("/save")
-	public String save(Producto producto, @RequestParam("img") MultipartFile file) throws IOException{
+	public String save(Producto producto, @RequestParam("img") MultipartFile file, HttpSession session) throws IOException{
 		
 		LOGGER.info("este es el objeto producto{}", producto);
-		Usuario u= new Usuario(1, "","","","","","","");
-		producto.setUsuario(u);	
+		
+		Usuario u= usuarioService.findById(Integer.parseInt(session.getAttribute("idusuario").toString() )).get();
+		producto.setUsuario(u);
 		
 		//imagen
 		if (producto.getId()==null) { // cuando se crea un producto
